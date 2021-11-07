@@ -5,23 +5,21 @@ using UnityEngine.SceneManagement;
 
 namespace TicTacToe.Loading
 {
-    public class MenuLoadingOperation : ILoadingOperation
+    public class CoreUnloadingOperation : ILoadingOperation
     {
-        public string Description => "Main menu loading...";
-
+        public string Description => "Ending game...";
+        
         public async Task Execute(Action<float> onProgress)
         {
             onProgress?.Invoke(0.2f);
             
-            AsyncOperation loadOp = SceneManager.LoadSceneAsync(
-                Constants.GetSceneIndex(Constants.EScene.MainMenu),
-                LoadSceneMode.Additive);
+            AsyncOperation loadOp = SceneManager.UnloadSceneAsync(Constants.GetSceneIndex(Constants.EScene.Core));
             
             while (loadOp.isDone == false)
             {
                 await Task.Delay(1000);
             }
-            
+
             onProgress?.Invoke(1f);
         }
     }

@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 namespace TicTacToe.UI
 {
-    public class SettingsScreen : MonoBehaviour
+    public class SettingsView : View
     {
         public void BackButton()
         {
-            SceneManager.UnloadSceneAsync(Constants.Constants.Scenes.SETTINGS);
+            UIManager.Instance.ShowLast();
         }
     }
 

@@ -8,7 +8,8 @@ namespace TicTacToe.Core
         [SerializeField] private BoardCell boardCellPrefab;
         [SerializeField] private Transform gridTransform;
         [SerializeField] private Board.Mark firstTurnMark;
-        
+
+        private int _boardSize;
         private Board _board;
         private BoardCell[,] _boardCells;
         private bool _firstPlayerTurn;
@@ -16,15 +17,14 @@ namespace TicTacToe.Core
         
         public Board Board => _board;
         public bool FirstPlayerTurn => _firstPlayerTurn;
-
         public BoardState BoardStatus => _boardStatus;
-
         public bool CanContinue => _boardStatus == BoardState.None;
         
         
         public void InitBoard(int boardSize)
         {
-            ClearBoard();
+            DeleteBoardCells();
+            _boardSize = boardSize;
             _board = new Board(boardSize);
 
             _boardCells = new BoardCell[boardSize, boardSize];
@@ -41,12 +41,25 @@ namespace TicTacToe.Core
             _firstPlayerTurn = true;
         }
 
-        private void ClearBoard()
+        private void DeleteBoardCells()
         {
             foreach (Transform child in gridTransform)
             {
                 Destroy(child.gameObject);
             }
+        }
+
+        public void ClearBoard()
+        {
+            for (int i = 0; i <= _boardCells.GetUpperBound(0); i++)
+            {
+                for (int j = 0; j <= _boardCells.GetUpperBound(1); j++)
+                {
+                    _boardCells[i, j].SetIcon(Board.Mark.None);
+                }
+            }
+            
+            _board = new Board(_boardSize);
         }
 
         public bool TryPlaceMark(CellCoordinates cellCoord)
@@ -60,7 +73,6 @@ namespace TicTacToe.Core
             if (_board.TryToPlaceMark(boardCell.Coordinates, mark))
             {
                 boardCell.SetIcon(mark);
-                _firstPlayerTurn = !_firstPlayerTurn;
                 UpdateBoardState();
                 return true;
             }
@@ -72,7 +84,7 @@ namespace TicTacToe.Core
         {
             if (_board.CheckWinState())
             {
-                _boardStatus = BoardState.Win;
+                _boardStatus = BoardState.HaveWinRow;
                 return;
             }
 
@@ -82,6 +94,7 @@ namespace TicTacToe.Core
                 return;
             }
 
+            _firstPlayerTurn = !_firstPlayerTurn;
             _boardStatus = BoardState.None;
         }
         
@@ -97,7 +110,7 @@ namespace TicTacToe.Core
         
         public enum BoardState
         {
-            Win,
+            HaveWinRow,
             Draw,
             None
         }

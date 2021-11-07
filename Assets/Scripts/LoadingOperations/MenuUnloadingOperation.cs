@@ -5,17 +5,15 @@ using UnityEngine.SceneManagement;
 
 namespace TicTacToe.Loading
 {
-    public class MenuLoadingOperation : ILoadingOperation
+    public class MenuUnloadingOperation : ILoadingOperation
     {
-        public string Description => "Main menu loading...";
-
+        public string Description => "Unload menu...";
+        
         public async Task Execute(Action<float> onProgress)
         {
             onProgress?.Invoke(0.2f);
             
-            AsyncOperation loadOp = SceneManager.LoadSceneAsync(
-                Constants.GetSceneIndex(Constants.EScene.MainMenu),
-                LoadSceneMode.Additive);
+            AsyncOperation loadOp = SceneManager.UnloadSceneAsync(Constants.GetSceneIndex(Constants.EScene.MainMenu));
             
             while (loadOp.isDone == false)
             {

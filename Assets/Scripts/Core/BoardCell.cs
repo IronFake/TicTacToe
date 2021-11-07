@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace TicTacToe.Core
@@ -18,7 +16,7 @@ namespace TicTacToe.Core
 
         private void Awake()
         {
-            button.onClick.AddListener(() => GameManager.Instance.PlaceMark(this));
+            button.onClick.AddListener(() => MatchController.Instance.PlaceMark(this));
         }
 
         public void SetCellIndex(CellCoordinates cellCoordinates)

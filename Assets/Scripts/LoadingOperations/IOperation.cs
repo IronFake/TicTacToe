@@ -8,5 +8,5 @@ public interface ILoadingOperation
 {
     string Description {get; }
 
-    Task Load(Action<float> onProgress);
+    Task Execute(Action<float> onProgress);
 }

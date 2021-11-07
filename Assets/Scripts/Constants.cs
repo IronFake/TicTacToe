@@ -1,14 +1,22 @@
-﻿using UnityEditor;
-
-namespace TicTacToe.Constants
+﻿
+namespace TicTacToe
 {
     public static class Constants
     {
-        public static class Scenes
+        public enum EScene
         {
-            public static int MAIN_MENU => 1;
-            public static int CORE => 2;
-            public static int SETTINGS => 3;
+            MainMenu = 1,
+            Core = 2,
+        }
+
+        public static int GetSceneIndex(EScene scene)
+        {
+            return (int) scene;
+        }
+
+        public static class PlayerPrefsKeys
+        {
+            public static string PLAYER_DATA => "PlayerData";
         }
     }
 }
