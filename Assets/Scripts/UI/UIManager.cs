@@ -9,8 +9,9 @@ namespace TicTacToe.UI
         [SerializeField] private View startingView;
         [SerializeField] private View[]  views;
 
-        private View _currentView;
+        public bool IsStartingView => _history.Count == 0;
         
+        private View _currentView;
         private readonly Stack<View> _history = new Stack<View>();
 
         private void Start()

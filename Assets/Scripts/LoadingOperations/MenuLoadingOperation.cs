@@ -22,6 +22,9 @@ namespace TicTacToe.Loading
                 await Task.Delay(1000);
             }
             
+            SceneManager.SetActiveScene(
+                SceneManager.GetSceneByBuildIndex(Constants.GetSceneIndex(Constants.EScene.MainMenu)));
+            
             onProgress?.Invoke(1f);
         }
     }

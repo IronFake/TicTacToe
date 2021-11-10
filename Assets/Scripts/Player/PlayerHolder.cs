@@ -11,7 +11,7 @@ namespace TicTacToe.Player
 
         public Player Player => _player;
         
-        public Action<Player> onPlayerUpdateAction;
+        public event Action<Player> ONPlayerUpdateAction;
         
         private void Start()
         {
@@ -33,7 +33,7 @@ namespace TicTacToe.Player
                 return false;
 
             player = JsonUtility.FromJson<Player>(playerData);
-            onPlayerUpdateAction?.Invoke(_player);
+            ONPlayerUpdateAction?.Invoke(_player);
             return true;
         }
         
@@ -57,13 +57,13 @@ namespace TicTacToe.Player
         public void UpdateName(string playerName)
         {
             _player.name = playerName;
-            onPlayerUpdateAction?.Invoke(_player);
+            ONPlayerUpdateAction?.Invoke(_player);
         }
 
         public void UpdateScore(int value)
         {
             _player.exp += value;
-            onPlayerUpdateAction?.Invoke(_player);
+            ONPlayerUpdateAction?.Invoke(_player);
         }
     }
 }

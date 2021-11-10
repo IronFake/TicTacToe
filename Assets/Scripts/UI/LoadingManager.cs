@@ -25,17 +25,18 @@ namespace TicTacToe.Loading
 
         public void Load(Constants.EScene scene)
         {
+            Queue<ILoadingOperation> operations = new Queue<ILoadingOperation>();
             switch (scene)
             {
                 case Constants.EScene.MainMenu:
-                    Queue<ILoadingOperation> operations1 = new Queue<ILoadingOperation>();
-                    operations1.Enqueue(new MenuLoadingOperation());
-                    Load(operations1);
+                    operations.Enqueue(new MenuLoadingOperation());
+                    operations.Enqueue(new DelayOperation());
+                    Load(operations);
                     break;
                 case Constants.EScene.Core:
-                    Queue<ILoadingOperation> operations2 = new Queue<ILoadingOperation>();
-                    operations2.Enqueue(new MenuLoadingOperation());
-                    Load(operations2);
+                    operations.Enqueue(new CoreLoadingOperation());
+                    operations.Enqueue(new DelayOperation());
+                    Load(operations);
                     break;
             }
         }
@@ -45,6 +46,7 @@ namespace TicTacToe.Loading
             Queue<ILoadingOperation> operations = new Queue<ILoadingOperation>();
             operations.Enqueue(new MenuUnloadingOperation());
             operations.Enqueue(new CoreLoadingOperation());
+            operations.Enqueue(new DelayOperation());
             Load(operations);
         }
 
@@ -53,6 +55,7 @@ namespace TicTacToe.Loading
             Queue<ILoadingOperation> operations = new Queue<ILoadingOperation>();
             operations.Enqueue(new CoreUnloadingOperation());
             operations.Enqueue(new MenuLoadingOperation());
+            operations.Enqueue(new DelayOperation());
             Load(operations);
         }
         

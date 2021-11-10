@@ -15,14 +15,5 @@ namespace TicTacToe.UI
         {
             UIManager.Instance.Show(ViewType.Settings);
         }
-
-        public void ChangeName()
-        {
-            var modalDialog = ModalDialog.Instance;
-            modalDialog.ShowChangeNameDialog(() =>
-            {
-                PlayerHolder.Instance.UpdateName(modalDialog.InputString);
-            });
-        }
     }
 }

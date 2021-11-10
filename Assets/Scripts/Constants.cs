@@ -17,6 +17,8 @@ namespace TicTacToe
         public static class PlayerPrefsKeys
         {
             public static string PLAYER_DATA => "PlayerData";
+            public static string BACKGROUND_MUSIC_VOLUME => "BGMusicVolume";
+            public static string BACKGROUND_MUSIC_ON => "BGMusicOn";
         }
     }
 }

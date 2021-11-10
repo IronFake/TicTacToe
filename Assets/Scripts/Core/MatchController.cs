@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using TicTacToe.Core.Bot;
 using TicTacToe.Loading;
 using TicTacToe.Player;
 using TicTacToe.UI;
-using TMPro;
 using UnityEngine;
 
 namespace TicTacToe.Core
@@ -15,45 +13,48 @@ namespace TicTacToe.Core
         [SerializeField] private BoardController boardController;
         [SerializeField] private Animation endMatchAnimation;
         [SerializeField] private Stopwatch stopwatch;
-        [SerializeField] private TextMeshProUGUI firstPlayerName;
-        [SerializeField] private TextMeshProUGUI opponentPlayerName;
-        [SerializeField] private TextMeshProUGUI firstPlayerWinStreak;
-        [SerializeField] private TextMeshProUGUI opponentPlayerWinStreak;
-
-        private bool PlayerTurn => _playerTurnFirst == boardController.FirstPlayerTurn;
+        [SerializeField] private MemberInfo playerForCrossInfo;
+        [SerializeField] private MemberInfo playerForRingInfo;
         
-        private GameConfig _gameConfig;
-        private bool _playerTurnFirst;
+        private bool PlayerTurn => _playerMark == boardController.Turn;
+        
+        private GameConfig _matchConfig;
+        private Board.Mark  _playerMark;
         private GameResult _matchResult;
         private IBotStrategy _botStrategy;
+        private bool alreadyTurn;
         
         private void Start()
         {
-            _matchResult = new GameResult();
             InitMatch(DataHolder.Instance.GameConfig);
         }
 
         private void InitMatch(GameConfig gameConfig)
         {
-            _gameConfig = gameConfig;
-            _playerTurnFirst = gameConfig.playerTurnFirst;
-            InitPlayerNames();
-            InitBoard();
+            _matchResult = new GameResult();
+            _matchConfig = gameConfig;
+            _playerMark = _matchConfig.playerMark;
+            StartMatch();
+            
             stopwatch.StartStopWatch();
         }
         
-        private void InitPlayerNames()
+        private void UpdateMemberInfo()
         {
-            firstPlayerName.text = _gameConfig.player.name;
-            opponentPlayerName.text = _gameConfig.opponent.name;
+            playerForCrossInfo.UpdateInfo(_matchConfig.playerForCross.name, _matchResult.crossWins);
+            playerForRingInfo.UpdateInfo(_matchConfig.playerForRing.name, _matchResult.ringWins);
         }
 
-        private void InitBoard()
+        private void StartMatch()
         {
-            boardController.InitBoard(_gameConfig.boardSize);
+            boardController.InitBoard(_matchConfig.boardSize);
             _botStrategy = new RandomStrategy(boardController.Board);
             
-            if (_playerTurnFirst == false)
+            endMatchAnimation.gameObject.SetActive(false);
+            UpdateMemberInfo();
+            alreadyTurn = false;
+            
+            if (!PlayerTurn)
             {
                 BotTurn();
             }
@@ -61,19 +62,22 @@ namespace TicTacToe.Core
         
         public void PlaceMark(BoardCell boardCell)
         {
-            if (PlayerTurn)
+            if (PlayerTurn && alreadyTurn == false)
             {
-                boardController.TryPlaceMark(boardCell);
-                if (boardController.CanContinue)
+                alreadyTurn = true;
+                if (boardController.TryPlaceMark(boardCell))
                 {
-                    BotTurn();
                     if (boardController.CanContinue)
                     {
+                        BotTurn();
                         return;
                     }
+                    
+                    CheckBoardState();
+                    return;
                 }
                 
-                EndMatch();
+                alreadyTurn = false;
             }
         }
         
@@ -81,76 +85,73 @@ namespace TicTacToe.Core
         {
             _botStrategy.TryToChooseCell(out CellCoordinates chosenCell);
             boardController.TryPlaceMark(chosenCell);
+            CheckBoardState();
+            alreadyTurn = false;
+        }
+
+        private void CheckBoardState()
+        {
+            BoardController.BoardState currentBoardState = boardController.State;
+            if(currentBoardState == BoardController.BoardState.None)
+                return;
+            
+            switch (currentBoardState)
+            {
+                case BoardController.BoardState.CrossWin:
+                    _matchResult.crossWins += 1;
+                    break;
+                case BoardController.BoardState.RingWin:
+                    _matchResult.ringWins += 1;
+                    break;
+            }
+            
+            StartCoroutine(PlayEndAnimation(currentBoardState));
+        }
+
+        IEnumerator PlayEndAnimation(BoardController.BoardState boardState)
+        {
+            if (boardState == BoardController.BoardState.Draw)
+            {
+                endMatchAnimation.gameObject.SetActive(true);
+                endMatchAnimation.Play("DrawAnimation");
+            }
+            else
+            {
+                if (PlayerTurn)
+                {
+                    endMatchAnimation.gameObject.SetActive(true);
+                    endMatchAnimation.Play("WinAnimation");
+                }
+                else
+                {
+                    endMatchAnimation.gameObject.SetActive(true);
+                    endMatchAnimation.Play("LoseAnimation");
+                }
+            }
+            
+            yield return new WaitForSeconds(endMatchAnimation.clip.length + 2);
+            CheckEndMatch();
+        }
+
+        private void CheckEndMatch()
+        {
+            if (_matchResult.crossWins >= _matchConfig.targetWinCount ||
+                _matchResult.ringWins >= _matchConfig.targetWinCount)
+            {
+                EndMatch();
+            }
+            else
+            {
+                StartMatch();
+            }
         }
 
         private void EndMatch()
         {
-            BoardController.BoardState currentBoardState = boardController.BoardStatus;
-            switch (currentBoardState)
-            {
-                case BoardController.BoardState.HaveWinRow:
-                    if (PlayerTurn)
-                    {
-                        _matchResult.playerWinCount += 1;
-                        if (_matchResult.playerWinCount < _gameConfig.targetWinCount)
-                        {
-                            firstPlayerWinStreak.text = _matchResult.playerWinCount.ToString();
-                            InitBoard();
-                        }
-                        else
-                        {
-                            StartCoroutine(PlayEndAnimation(currentBoardState, true));
-                        }
-                    }
-                    else
-                    {
-                        _matchResult.opponentWinCount += 1;
-                        if (_matchResult.opponentWinCount < _gameConfig.targetWinCount)
-                        {
-                            opponentPlayerWinStreak.text = _matchResult.opponentWinCount.ToString();
-                            InitBoard();
-                        }
-                        else
-                        {
-                            StartCoroutine(PlayEndAnimation(currentBoardState, false));
-                        }
-                    }
-                    break;
-                case BoardController.BoardState.Draw:
-                    InitBoard();
-                    //StartCoroutine(PlayEndAnimation(currentBoardState));
-                    break;
-            }
-        }
-
-        IEnumerator PlayEndAnimation(BoardController.BoardState boardState, bool win = false)
-        {
             stopwatch.StopStopwatch();
-            switch (boardState)
-            {
-                case BoardController.BoardState.HaveWinRow:
-                    if (win)
-                    {
-                        endMatchAnimation.gameObject.SetActive(true);
-                        endMatchAnimation.Play("WinAnimation");
-                    }
-                    else
-                    {
-                        endMatchAnimation.gameObject.SetActive(true);
-                        endMatchAnimation.Play("LoseAnimation");
-                    }
-                    break;
-                case BoardController.BoardState.Draw:
-                    endMatchAnimation.gameObject.SetActive(true);
-                    endMatchAnimation.Play("DrawAnimation");
-                    break;
-            }
-
-            yield return new WaitForSeconds(endMatchAnimation.clip.length + 2);
-
-            _matchResult.winner = win ? _gameConfig.player : _gameConfig.opponent;
+            _matchResult.winner = boardController.Turn == Board.Mark.X ? _matchConfig.playerForCross : _matchConfig.playerForRing;
+            _matchResult.pointsForMatch = PlayerTurn ? matchPoints : -matchPoints;
             _matchResult.durationGame = stopwatch.StopwatchTime;
-            _matchResult.pointsForMatch = win ? matchPoints : -matchPoints;
             
             PlayerHolder.Instance.UpdateScore(_matchResult.pointsForMatch);
             DataHolder.Instance.GameResult = _matchResult;

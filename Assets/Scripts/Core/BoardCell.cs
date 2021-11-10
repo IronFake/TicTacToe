@@ -9,6 +9,9 @@ namespace TicTacToe.Core
         [SerializeField] private Sprite crossIcon;
         [SerializeField] private Sprite ringIcon;
         [SerializeField] private Button button;
+        [SerializeField] private Color crossColor;
+        [SerializeField] private Color ringColor;
+        [SerializeField] private Animation markAnimation;
 
         private CellCoordinates _cellCoordinates;
 
@@ -30,12 +33,18 @@ namespace TicTacToe.Core
             {
                 case Board.Mark.O:
                     icon.sprite = ringIcon;
+                    icon.color = ringColor;
+                    icon.enabled = true;
+                    markAnimation.Play("RingAnimation");
                     break;
                 case Board.Mark.X:
                     icon.sprite = crossIcon;
+                    icon.color = crossColor;
+                    icon.enabled = true;
+                    markAnimation.Play("CrossAnimation");
                     break;
                 default:
-                    icon.sprite = null;
+                    icon.enabled = false;
                     break;
             }
         }

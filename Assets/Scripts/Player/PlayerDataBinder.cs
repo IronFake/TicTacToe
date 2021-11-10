@@ -12,21 +12,18 @@ namespace TicTacToe.Player
         private void Awake()
         {
             textField = GetComponent<TextMeshProUGUI>();
+            
         }
-
-        private void Start()
-        {
-            UpdateValue(PlayerHolder.Instance.Player);
-        }
-
+        
         private void OnEnable()
         {
-            PlayerHolder.Instance.onPlayerUpdateAction += UpdateValue;
+            PlayerHolder.Instance.ONPlayerUpdateAction += UpdateValue;
+            UpdateValue(PlayerHolder.Instance.Player);
         }
 
         private void OnDisable()
         {
-            PlayerHolder.Instance.onPlayerUpdateAction -= UpdateValue;
+            PlayerHolder.Instance.ONPlayerUpdateAction -= UpdateValue;
         }
 
         protected abstract void UpdateValue(Player player);

@@ -12,14 +12,13 @@ namespace TicTacToe.Core
         private int _boardSize;
         private Board _board;
         private BoardCell[,] _boardCells;
-        private bool _firstPlayerTurn;
+        private Board.Mark _turn;
         private BoardState _boardStatus;
         
         public Board Board => _board;
-        public bool FirstPlayerTurn => _firstPlayerTurn;
-        public BoardState BoardStatus => _boardStatus;
+        public Board.Mark Turn => _turn;
+        public BoardState State => _boardStatus;
         public bool CanContinue => _boardStatus == BoardState.None;
-        
         
         public void InitBoard(int boardSize)
         {
@@ -38,7 +37,7 @@ namespace TicTacToe.Core
                 }
             }
 
-            _firstPlayerTurn = true;
+            _turn = firstTurnMark;
         }
 
         private void DeleteBoardCells()
@@ -48,20 +47,7 @@ namespace TicTacToe.Core
                 Destroy(child.gameObject);
             }
         }
-
-        public void ClearBoard()
-        {
-            for (int i = 0; i <= _boardCells.GetUpperBound(0); i++)
-            {
-                for (int j = 0; j <= _boardCells.GetUpperBound(1); j++)
-                {
-                    _boardCells[i, j].SetIcon(Board.Mark.None);
-                }
-            }
-            
-            _board = new Board(_boardSize);
-        }
-
+        
         public bool TryPlaceMark(CellCoordinates cellCoord)
         {
              return TryPlaceMark(_boardCells[cellCoord.x, cellCoord.y]);
@@ -69,10 +55,9 @@ namespace TicTacToe.Core
 
         public bool TryPlaceMark(BoardCell boardCell)
         {
-            Board.Mark mark = GetMark();
-            if (_board.TryToPlaceMark(boardCell.Coordinates, mark))
+            if (_board.TryToPlaceMark(boardCell.Coordinates, _turn))
             {
-                boardCell.SetIcon(mark);
+                boardCell.SetIcon(_turn);
                 UpdateBoardState();
                 return true;
             }
@@ -84,7 +69,7 @@ namespace TicTacToe.Core
         {
             if (_board.CheckWinState())
             {
-                _boardStatus = BoardState.HaveWinRow;
+                _boardStatus = _turn == Board.Mark.X ? BoardState.CrossWin : BoardState.RingWin;
                 return;
             }
 
@@ -94,23 +79,14 @@ namespace TicTacToe.Core
                 return;
             }
 
-            _firstPlayerTurn = !_firstPlayerTurn;
+            _turn = _turn == Board.Mark.X ? Board.Mark.O : Board.Mark.X;
             _boardStatus = BoardState.None;
-        }
-        
-        private Board.Mark GetMark()
-        {
-            if (_firstPlayerTurn)
-            {
-                return firstTurnMark;
-            }
-            
-            return firstTurnMark == Board.Mark.X ? Board.Mark.O : Board.Mark.X;
         }
         
         public enum BoardState
         {
-            HaveWinRow,
+            CrossWin,
+            RingWin,
             Draw,
             None
         }

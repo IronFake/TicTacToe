@@ -24,7 +24,12 @@ namespace TicTacToe.UI
         [SerializeField] private TextMeshProUGUI declineButtonText;
 
         public string InputString => inputField.text;
-        
+        public bool IsOpen
+        {
+            get => canvas.enabled;
+            set => canvas.enabled = value;
+        }
+
         private Action _onConfirmCallback;
         private Action _onDeclineCallback;
 

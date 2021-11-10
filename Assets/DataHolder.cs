@@ -16,7 +16,7 @@ public class DataHolder : SingletonPersistent<DataHolder>
             {
                 _gameConfig.boardSize = 3;
                 _gameConfig.targetWinCount = 1;
-                _gameConfig.playerTurnFirst = false;
+                _gameConfig.playerMark = Board.Mark.X;
             }
 
             return _gameConfig;

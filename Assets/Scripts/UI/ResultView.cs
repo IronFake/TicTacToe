@@ -32,7 +32,7 @@ namespace TicTacToe.UI
                 }
                 else
                 {
-                    playerPoints.text = string.Format("{0} (-{1})", 
+                    playerPoints.text = string.Format("{0} ({1})", 
                         PlayerHolder.Instance.Player.exp.ToString(),
                         gameResult.pointsForMatch.ToString());
                 }

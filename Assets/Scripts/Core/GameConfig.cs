@@ -4,16 +4,16 @@
     {
         public int boardSize;
         public int targetWinCount;
-        public Player.Player player;
-        public Player.Player opponent;
-        public bool playerTurnFirst;
+        public Player.Player playerForCross;
+        public Player.Player playerForRing;
+        public Board.Mark playerMark;
     }
 
     public struct GameResult
     {
         public Player.Player winner;
-        public int playerWinCount;
-        public int opponentWinCount;
+        public int crossWins;
+        public int ringWins;
         public float durationGame;
         public int pointsForMatch;
     }
