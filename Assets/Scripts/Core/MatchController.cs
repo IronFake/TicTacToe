@@ -17,12 +17,16 @@ namespace TicTacToe.Core
         [SerializeField] private MemberInfo playerForRingInfo;
         
         private bool PlayerTurn => _playerMark == boardController.Turn;
+
+        private readonly string _drawAnimationName = "DrawAnimation";
+        private readonly string _winAnimationName = "WinAnimation";
+        private readonly string _loseAnimationName = "LoseAnimation";
         
         private GameConfig _matchConfig;
         private Board.Mark  _playerMark;
         private GameResult _matchResult;
         private IBotStrategy _botStrategy;
-        private bool alreadyTurn;
+        private bool _alreadyTurn;
         
         private void Start()
         {
@@ -52,7 +56,7 @@ namespace TicTacToe.Core
             
             endMatchAnimation.gameObject.SetActive(false);
             UpdateMemberInfo();
-            alreadyTurn = false;
+            _alreadyTurn = false;
             
             if (!PlayerTurn)
             {
@@ -62,9 +66,9 @@ namespace TicTacToe.Core
         
         public void PlaceMark(BoardCell boardCell)
         {
-            if (PlayerTurn && alreadyTurn == false)
+            if (PlayerTurn && _alreadyTurn == false)
             {
-                alreadyTurn = true;
+                _alreadyTurn = true;
                 if (boardController.TryPlaceMark(boardCell))
                 {
                     if (boardController.CanContinue)
@@ -77,7 +81,7 @@ namespace TicTacToe.Core
                     return;
                 }
                 
-                alreadyTurn = false;
+                _alreadyTurn = false;
             }
         }
         
@@ -86,7 +90,7 @@ namespace TicTacToe.Core
             _botStrategy.TryToChooseCell(out CellCoordinates chosenCell);
             boardController.TryPlaceMark(chosenCell);
             CheckBoardState();
-            alreadyTurn = false;
+            _alreadyTurn = false;
         }
 
         private void CheckBoardState()
@@ -113,19 +117,19 @@ namespace TicTacToe.Core
             if (boardState == BoardController.BoardState.Draw)
             {
                 endMatchAnimation.gameObject.SetActive(true);
-                endMatchAnimation.Play("DrawAnimation");
+                endMatchAnimation.Play(_drawAnimationName);
             }
             else
             {
                 if (PlayerTurn)
                 {
                     endMatchAnimation.gameObject.SetActive(true);
-                    endMatchAnimation.Play("WinAnimation");
+                    endMatchAnimation.Play(_winAnimationName);
                 }
                 else
                 {
                     endMatchAnimation.gameObject.SetActive(true);
-                    endMatchAnimation.Play("LoseAnimation");
+                    endMatchAnimation.Play(_loseAnimationName);
                 }
             }
             

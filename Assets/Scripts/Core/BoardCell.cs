@@ -13,9 +13,13 @@ namespace TicTacToe.Core
         [SerializeField] private Color ringColor;
         [SerializeField] private Animation markAnimation;
 
+        public CellCoordinates Coordinates => _cellCoordinates;
+        
+        private readonly string _ringAnimationName = "RingAnimation";
+        private readonly string _crossAnimationName = "CrossAnimation";
+        
         private CellCoordinates _cellCoordinates;
 
-        public CellCoordinates Coordinates => _cellCoordinates;
 
         private void Awake()
         {
@@ -35,13 +39,13 @@ namespace TicTacToe.Core
                     icon.sprite = ringIcon;
                     icon.color = ringColor;
                     icon.enabled = true;
-                    markAnimation.Play("RingAnimation");
+                    markAnimation.Play(_ringAnimationName);
                     break;
                 case Board.Mark.X:
                     icon.sprite = crossIcon;
                     icon.color = crossColor;
                     icon.enabled = true;
-                    markAnimation.Play("CrossAnimation");
+                    markAnimation.Play(_crossAnimationName);
                     break;
                 default:
                     icon.enabled = false;
