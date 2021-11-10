@@ -1,2 +1,2 @@
 # TicTacToe
-Classic game in unity engine
+Classic game in UNITY engine
